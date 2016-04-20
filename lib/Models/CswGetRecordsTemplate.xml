@@ -17,6 +17,10 @@
                         <ogc:PropertyName>apiso:ServiceType</ogc:PropertyName>
                         <ogc:Literal>%WMS%</ogc:Literal>
                     </ogc:PropertyIsLike>
+                    <ogc:PropertyIsLike wildCard="%" singleChar="#" escapeChar="!">
+                        <ogc:PropertyName>apiso:ServiceType</ogc:PropertyName>
+                        <ogc:Literal>%WPS%</ogc:Literal>
+                    </ogc:PropertyIsLike>
                 </ogc:Or>
             </ogc:Filter>
         </csw:Constraint>
