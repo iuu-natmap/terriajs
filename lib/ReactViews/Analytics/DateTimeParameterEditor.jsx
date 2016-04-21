@@ -6,11 +6,14 @@ const DateTimeParameterEditor = React.createClass({
     propTypes: {
         previewed: React.PropTypes.object,
         parameter: React.PropTypes.object,
-        viewState: React.PropTypes.object,
         parameterValues: React.PropTypes.object
     },
 
     getInitialState() {
+        return this.getDateTime();
+    },
+
+    getDateTime() {
         const dateTimeBreakOut = {};
         const timeDate = this.props.parameterValues[this.props.parameter.id];
         if (timeDate !== undefined) {
@@ -29,22 +32,22 @@ const DateTimeParameterEditor = React.createClass({
         return dateTimeBreakOut;
     },
 
+    setDateTime(dateTime) {
+        this.props.parameterValues[this.props.parameter.id] = dateTime.date + 'T' + dateTime.time;
+    },
+
     onChangeDate(e) {
-        const splits = this.props.parameterValues[this.props.parameter.id].split('T');
-        this.props.parameterValues[this.props.parameter.id] = e.target.value + 'T' + splits[1];
-        this.setState({
-            date: e.target.value,
-            time: splits[1]
-        });
+        const dateTimeBreakOut = this.getDateTime();
+        dateTimeBreakOut.date = e.target.value;
+        this.setDateTime(dateTimeBreakOut);
+        this.setState(dateTimeBreakOut);
     },
 
     onChangeTime(e) {
-        const splits = this.props.parameterValues[this.props.parameter.id].split('T');
-        this.props.parameterValues[this.props.parameter.id] = splits[0] + 'T' + e.target.value;
-        this.setState({
-            date: splits[0],
-            time: e.target.value,
-        });
+        const dateTimeBreakOut = this.getDateTime();
+        dateTimeBreakOut.time = e.target.value;
+        this.setDateTime(dateTimeBreakOut);
+        this.setState(dateTimeBreakOut);
     },
 
     render() {
