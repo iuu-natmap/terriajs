@@ -21,6 +21,17 @@ var config = {
                 loader: 'imports?require=>false'
             }
         ]
+    },
+    devServer: {
+        stats: 'minimal',
+        port: 3002,
+        contentBase: 'wwwroot/'
+    },
+    worker: {
+        output: {
+            filename: "hash.worker.js",
+            chunkFilename: "[id].hash.worker.js"
+        }
     }
 };
 
