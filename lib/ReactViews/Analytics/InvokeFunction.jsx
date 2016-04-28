@@ -64,9 +64,9 @@ const InvokeFunction = React.createClass({
     },
 
     getParams() {
-		    // Key should include the previewed item identifier so that
-				// components are refreshed when different previewed items are
-				// displayed
+        // Key should include the previewed item identifier so that
+        // components are refreshed when different previewed items are
+        // displayed
         return this.props.previewed.parameters.map((param, i)=>
         <ParameterEditor key={param.id + this.props.previewed.identifier}
                          parameter={param}
