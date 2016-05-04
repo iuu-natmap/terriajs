@@ -25,7 +25,7 @@ const DateTimeParameterEditor = React.createClass({
                 dateTimeBreakOut.time = splits[1];
             }
         } else {
-            dateTimeBreakOut.date = '2000-01-01';
+            dateTimeBreakOut.date = '';
             dateTimeBreakOut.time = '00:00';
         }
         this.props.parameterValues[this.props.parameter.id] = dateTimeBreakOut.date + 'T' + dateTimeBreakOut.time;
