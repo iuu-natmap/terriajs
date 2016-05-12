@@ -60,6 +60,7 @@ const DataCatalogItem = React.createClass({
         return (
             <li className={classNames('clearfix data-catalog-item', {'is-previewed': this.isSelected()})}>
                 <button type='button'
+                        title={item.description}
                         onClick={this.setPreviewedItem}
                         className={`btn btn--catalog-item ${item.isMappable ? 'catalog-item' : 'service-item'}`}>
                     {item.name}
