@@ -62,7 +62,7 @@ const BBoxParameterEditor = React.createClass({
         terria.pickedFeatures = undefined;
 
         const pickPointMode = new MapInteractionMode({
-            message: 'Click to start rectangle, move cursor to change extent, then click again to finish.',
+            message: 'Press the ALT key and hold down the left mouse button to draw a rectangle.',
             drawRectangle: true,
             onCancel: function() {
                 terria.mapInteractionModeStack.pop();
