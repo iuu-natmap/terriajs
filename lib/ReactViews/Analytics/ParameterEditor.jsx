@@ -25,15 +25,8 @@ const ParameterEditor = React.createClass({
 
     renderEditor() {
         switch(this.props.parameter.type) {
-				/*
         case 'point':
             return <PointParameterEditor previewed={this.props.previewed}
-                                         viewState={this.props.viewState}
-                                         parameter={this.props.parameter}
-                                         parameterValues={this.props.parameterValues}
-                    />;*/
-        case 'point':
-            return <BBoxParameterEditor previewed={this.props.previewed}
                                          viewState={this.props.viewState}
                                          parameter={this.props.parameter}
                                          parameterValues={this.props.parameterValues}
