@@ -62,19 +62,22 @@ const BBoxParameterEditor = React.createClass({
         terria.pickedFeatures = undefined;
 
         const pickPointMode = new MapInteractionMode({
-            message: 'Press the ALT key and hold down the left mouse button to draw a rectangle.',
+            message: 'Press the SHIFT key and hold down the left mouse button to draw a rectangle.',
             drawRectangle: true,
             onCancel: function() {
                 terria.mapInteractionModeStack.pop();
+                terria.selectBox = false;
                 that.props.viewState.openAddData();
             }
         });
+        terria.selectBox = true;
         terria.mapInteractionModeStack.push(pickPointMode);
 
         knockout.getObservable(pickPointMode, 'pickedFeatures').subscribe(function(pickedFeatures) {
             if (pickedFeatures instanceof Rectangle) {
                 that.props.parameterValues[that.props.parameter.id] = pickedFeatures; 
                 terria.mapInteractionModeStack.pop();
+                terria.selectBox = false;
                 that.props.viewState.openAddData();
                 that.setState({
                     value: that.getValue()
