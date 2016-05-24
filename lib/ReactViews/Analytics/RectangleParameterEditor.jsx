@@ -7,7 +7,7 @@ import knockout from 'terriajs-cesium/Source/ThirdParty/knockout';
 import MapInteractionMode from '../../Models/MapInteractionMode';
 import ObserveModelMixin from '../ObserveModelMixin';
 
-const BBoxParameterEditor = React.createClass({
+const RectangleParameterEditor = React.createClass({
     mixins: [ObserveModelMixin],
 
     propTypes: {
@@ -55,7 +55,7 @@ const BBoxParameterEditor = React.createClass({
         this.props.parameterValues[this.props.parameter.id] = Rectangle.fromCartographicArray(coords);
     },
 
-    selectBBOXOnMap() {
+    selectRectangleOnMap() {
         const terria = this.props.previewed.terria;
         const that = this;
         // Cancel any feature picking already in progress.
@@ -91,9 +91,9 @@ const BBoxParameterEditor = React.createClass({
     render() {
         return <div className=''>
                     <input className='field field--parameter-editor' type="text" onChange={this.onTextChange} value={this.state.value}/>
-                    <button type='button' onClick={this.selectBBOXOnMap} className='btn btn-primary btn-selector'>Click to draw rectangle.</button>
+                    <button type='button' onClick={this.selectRectangleOnMap} className='btn btn-primary btn-selector'>Click to draw rectangle.</button>
                 </div>;
     }
 });
 
-module.exports = BBoxParameterEditor;
+module.exports = RectangleParameterEditor;
