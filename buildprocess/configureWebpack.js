@@ -1,13 +1,15 @@
 var path = require('path');
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var StringReplacePlugin = require("string-replace-webpack-plugin");
-const cesiumDir = path.dirname(require.resolve('terriajs-cesium'));
 
-function configureWebpack(terriaJSBasePath, config, devMode, hot) {
+function configureWebpack(terriaJSBasePath, config, devMode, hot, ExtractTextPlugin, disableStyleLoader) {
+    const cesiumDir = path.dirname(require.resolve('terriajs-cesium/package.json'));
+
     config.resolve = config.resolve || {};
     config.resolve.extensions = config.resolve.extensions || ['', '.webpack.js', '.web.js', '.js'];
     config.resolve.extensions.push('.jsx');
     config.resolve.alias = config.resolve.alias || {};
+    config.resolve.root = config.resolve.root || [];
+    config.resolve.root.push(path.resolve(terriaJSBasePath, 'wwwroot'));
 
     config.module = config.module || {};
     config.module.loaders = config.module.loaders || [];
@@ -25,7 +27,7 @@ function configureWebpack(terriaJSBasePath, config, devMode, hot) {
                 {
                     pattern: /buildModuleUrl\([\'|\"](.*)[\'|\"]\)/ig,
                     replacement: function (match, p1, offset, string) {
-                        return "require('" + cesiumDir + "/Source/" + p1 + "')";
+                        return "require('" + cesiumDir.replace(/\\/g, '\\\\') + "/Source/" + p1.replace(/\\/g, '\\\\') + "')";
                     }
                 }
             ]
@@ -40,7 +42,7 @@ function configureWebpack(terriaJSBasePath, config, devMode, hot) {
                 {
                     pattern: /new Worker\(obj\.zip\.workerScriptsPath \+(.*)\)/ig,
                     replacement: function (match, p1, offset, string) {
-                        return "require('" + require.resolve('worker-loader') + "!" + cesiumDir + "/Source/ThirdParty/Workers/' + " + p1 + ")()";
+                        return "require('" + require.resolve('worker-loader').replace(/\\/g, '\\\\') + "!" + cesiumDir.replace(/\\/g, '\\\\') + "/Source/ThirdParty/Workers/' + " + p1.replace(/\\/g, '\\\\') + ")()";
                     }
                 }
             ]
@@ -49,7 +51,7 @@ function configureWebpack(terriaJSBasePath, config, devMode, hot) {
 
     config.module.loaders.push({
         test: /\.js?$/,
-        include: cesiumDir + '/Source/ThirdParty/Workers',
+        include: path.resolve(cesiumDir, 'Source', 'ThirdParty', 'Workers'),
         loader: StringReplacePlugin.replace({
             replacements: [
                 {
@@ -70,13 +72,13 @@ function configureWebpack(terriaJSBasePath, config, devMode, hot) {
                 {
                     pattern: /new Worker\(getBootstrapperUrl\(\)\)/ig,
                     replacement: function (match, p1, offset, string) {
-                        return "require('" + require.resolve('worker-loader') + "!" + require.resolve('../lib/cesiumWorkerBootstrapper') + "')()";
+                        return "require('" + require.resolve('worker-loader').replace(/\\/g, '\\\\') + "!" + require.resolve('../lib/cesiumWorkerBootstrapper').replace(/\\/g, '\\\\') + "')()";
                     }
                 },
                 {
                     pattern: "new Worker(getWorkerUrl('Workers/transferTypedArrayTest.js'))",
                     replacement: function (match, p1, offset, string) {
-                        return "require('" + require.resolve('worker-loader') + "!" + cesiumDir + "/Source/Workers/transferTypedArrayTest.js')()";
+                        return "require('" + require.resolve('worker-loader').replace(/\\/g, '\\\\') + "!" + cesiumDir.replace(/\\/g, '\\\\') + "/Source/Workers/transferTypedArrayTest.js')()";
                     }
                 }
             ]
@@ -85,7 +87,7 @@ function configureWebpack(terriaJSBasePath, config, devMode, hot) {
 
     config.module.loaders.push({
         test: /\.js?$/,
-        include: path.dirname(require.resolve('terriajs-cesium')) + '/Source/Workers',
+        include: path.resolve(cesiumDir, 'Source', 'Workers'),
         loader: StringReplacePlugin.replace({
             replacements: [
                 {
@@ -135,7 +137,7 @@ function configureWebpack(terriaJSBasePath, config, devMode, hot) {
     config.module.loaders.push({
         test: /\.json|xml$/,
         loader: require.resolve('file-loader'),
-        include: cesiumDir + '/Source/Assets'
+        include: path.resolve(cesiumDir, 'Source', 'Assets')
     });
 
     config.module.loaders.push({
@@ -144,9 +146,27 @@ function configureWebpack(terriaJSBasePath, config, devMode, hot) {
         include: cesiumDir
     });
 
+    var externalModulesWithJson = ['proj4/package.json', 'entities', 'html-to-react', 'ent', 'htmlparser2/package.json']
+        .map(function(module) {
+           try {
+               return path.dirname(require.resolve(module));
+           } catch (e) {
+               console.warn('Could not resolve module "' + module + ". Possibly this is no longer a dep of the project?");
+           }
+        }).filter(function(resolvedModule) {
+            return !!resolvedModule;
+        });
+
     config.module.loaders.push({
         test: /\.json$/,
+        include: externalModulesWithJson,
         loader: require.resolve('json-loader')
+    });
+
+    config.module.loaders.push({
+        test: /\.js$/,
+        include: path.resolve(path.dirname(require.resolve('terriajs-cesium/package.json')), 'Source'),
+        loader: require.resolve('./removeCesiumDebugPragmas')
     });
 
     // Don't let Cesium's `buildModuleUrl` and `TaskProcessor` see require - only the AMD version is relevant.
@@ -157,17 +177,40 @@ function configureWebpack(terriaJSBasePath, config, devMode, hot) {
 
     config.module.loaders.push({
         test: /\.(png|jpg|svg|gif)$/,
-        loader: require.resolve('url-loader') + '?limit=8192'
+        include: [
+            path.resolve(terriaJSBasePath),
+            path.resolve(cesiumDir)
+        ],
+        exclude: [
+            path.resolve(terriaJSBasePath, 'wwwroot', 'images', 'icons'),
+            path.resolve(terriaJSBasePath, 'wwwroot', 'fonts')
+        ],
+        loader: require.resolve('url-loader'),
+        query: {
+            limit: 8192
+        }
     });
 
     config.module.loaders.push({
-        test: /fonts\/.*\.woff(2)?(\?.+)?$/,
-        loader: require.resolve('url-loader') + '?limit=10000&mimetype=application/font-woff'
+        test: /\.woff(2)?(\?.+)?$/,
+        include: path.resolve(terriaJSBasePath, 'wwwroot', 'fonts'),
+        loader: require.resolve('url-loader'),
+        query: {
+            limit: 10000,
+            mimetype: 'application/font-woff'
+        }
     });
 
     config.module.loaders.push({
-        test: /fonts\/.*\.(ttf|eot|svg)(\?.+)?/,
+        test: /\.(ttf|eot|svg)(\?.+)?$/,
+        include: path.resolve(terriaJSBasePath, 'wwwroot', 'fonts'),
         loader: require.resolve('file-loader')
+    });
+
+    config.module.loaders.push({
+        test: /\.svg$/,
+        include: path.resolve(terriaJSBasePath, 'wwwroot', 'images', 'icons'),
+        loader: require.resolve('svg-sprite-loader')
     });
 
     config.devServer = config.devServer || {
@@ -183,7 +226,8 @@ function configureWebpack(terriaJSBasePath, config, devMode, hot) {
                         req.url.indexOf('/convert') < 0 &&
                         req.url.indexOf('/proxyabledomains') < 0 &&
                         req.url.indexOf('/errorpage') < 0 &&
-                        req.url.indexOf('/initfile') < 0) {
+                        req.url.indexOf('/init') < 0 &&
+                        req.url.indexOf('/serverconfig') < 0) {
                         return req.originalUrl;
                     }
                 }
@@ -191,32 +235,47 @@ function configureWebpack(terriaJSBasePath, config, devMode, hot) {
         },
     };
 
-    config.sassLoader = {
-        includePaths: [path.resolve(__dirname, "../lib/Sass")]
-    };
-
     config.plugins = (config.plugins || []).concat([
         new StringReplacePlugin()
     ]);
 
-
-    if (hot) {
+    if (hot && !disableStyleLoader) {
         config.module.loaders.push({
+            include: path.resolve(terriaJSBasePath),
             test: /\.scss$/,
-            loaders: [require.resolve('style-loader'), require.resolve('css-loader') + '?sourceMap', require.resolve('sass-loader') + '?sourceMap']
+            loaders: [
+                require.resolve('style-loader'),
+                require.resolve('css-loader') + '?sourceMap&modules&camelCase&localIdentName=tjs-[name]__[local]&importLoaders=2',
+                require.resolve('resolve-url-loader') + '?sourceMap',
+                require.resolve('sass-loader') + '?sourceMap'
+            ]
         });
-    } else {
+    } else if (ExtractTextPlugin) {
         config.module.loaders.push({
+            exclude: path.resolve(terriaJSBasePath, 'lib', 'Sass'),
+            include: path.resolve(terriaJSBasePath, 'lib'),
             test: /\.scss$/,
-            loader: ExtractTextPlugin.extract(require.resolve('css-loader') + '?sourceMap!' + require.resolve('sass-loader') + '?sourceMap', {
-                publicPath: ''
-            })
+            loader: ExtractTextPlugin.extract(
+                require.resolve('css-loader') + '?sourceMap&modules&camelCase&localIdentName=tjs-[name]__[local]&importLoaders=2!' +
+                require.resolve('resolve-url-loader') + '?sourceMap!' +
+                require.resolve('sass-loader') + '?sourceMap',
+                {
+                    publicPath: ''
+                }
+            )
         });
-
-        config.plugins.push(
-            new ExtractTextPlugin("nationalmap.css")
-        );
     }
+
+    config.resolve = config.resolve || {};
+    config.resolve.alias = config.resolve.alias || {};
+
+    // Make a terriajs-variables alias so it's really easy to override our sass variables by aliasing over the top of this.
+    config.resolve.alias['terriajs-variables'] = config.resolve.alias['terriajs-variables'] || require.resolve('../lib/Sass/common/_variables.scss');
+
+    // Alias react and react-dom to the one used by the building folder - apparently we can rely on the dir always being
+    // called node_modules https://github.com/npm/npm/issues/2734
+    config.resolve.alias['react'] = path.dirname(require.resolve('react'));
+    config.resolve.alias['react-dom'] = path.dirname(require.resolve('react-dom'));
 
     return config;
 }

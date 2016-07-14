@@ -1,6 +1,9 @@
 import React from 'react';
-import Dropdown from '../Dropdown';
+import Dropdown from '../Generic/Dropdown';
 import FeatureDetection from 'terriajs-cesium/Source/Core/FeatureDetection';
+import Icon from "../Icon.jsx";
+
+import Styles from './feature-info-download.scss';
 
 const FeatureInfoDownload = React.createClass({
     propTypes: {
@@ -50,9 +53,9 @@ const FeatureInfoDownload = React.createClass({
         return (
             <Dropdown options={links}
                       textProperty="label"
-                      className="feature-info-download"
-                      buttonClassName="btn-primary">
-                <i style={{display: 'inline-block'}} className="icon icon-download"/> Download Data&nbsp;▾
+                      theme={{dropdown: Styles.download, list: Styles.dropdownList, button: Styles.dropdownButton}}
+                      buttonClassName={Styles.btn}>
+                <span className={Styles.iconDownload}><Icon glyph={Icon.GLYPHS.download}/></span> Download Data&nbsp;▾
             </Dropdown>
         );
     }
@@ -88,7 +91,7 @@ function generateCsvData(data) {
         const type = typeof data[key];
 
         // If data is too hierarchical to fit in a table, just return undefined as we can't generate a CSV.
-        if (type === 'object') { // covers both objects and arrays.
+        if (type === 'object' && data[key] !== null) { // covers both objects and arrays.
             return;
         }
         if (type === 'function') {

@@ -1,6 +1,8 @@
 import React from 'react';
 import ObserveModelMixin from '../ObserveModelMixin';
 
+import Styles from './parameter-editors.scss';
+
 const DateTimeParameterEditor = React.createClass({
     mixins: [ObserveModelMixin],
     propTypes: {
@@ -28,12 +30,18 @@ const DateTimeParameterEditor = React.createClass({
             dateTimeBreakOut.date = '';
             dateTimeBreakOut.time = '00:00';
         }
-        this.props.parameterValues[this.props.parameter.id] = dateTimeBreakOut.date + 'T' + dateTimeBreakOut.time;
+
+        this.setDateTime(dateTimeBreakOut);
+
         return dateTimeBreakOut;
     },
 
     setDateTime(dateTime) {
-        this.props.parameterValues[this.props.parameter.id] = dateTime.date + 'T' + dateTime.time;
+        if (dateTime.date && dateTime.time) {
+            this.props.parameterValues[this.props.parameter.id] = dateTime.date + 'T' + dateTime.time;
+        } else {
+            this.props.parameterValues[this.props.parameter.id] = undefined;
+        }
     },
 
     onChangeDate(e) {
@@ -52,17 +60,17 @@ const DateTimeParameterEditor = React.createClass({
 
     render() {
         return (<div>
-                 <input className='field'
-                        type="date"
-                        placeholder="YYYY-MM-DD"
-                        onChange={this.onChangeDate}
-                        value={this.state.date}/>
-                 <input className='field'
-                        type="time"
-                        placeholder="HH:mm:ss.sss"
-                        onChange={this.onChangeTime}
-                        value={this.state.time}/>
-                </div>);
+            <input className={Styles.field}
+                   type="date"
+                   placeholder="YYYY-MM-DD"
+                   onChange={this.onChangeDate}
+                   value={this.state.date}/>
+            <input className={Styles.field}
+                   type="time"
+                   placeholder="HH:mm:ss.sss"
+                   onChange={this.onChangeTime}
+                   value={this.state.time}/>
+        </div>);
     }
 });
 

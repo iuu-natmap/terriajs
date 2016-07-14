@@ -2,44 +2,58 @@
 
 import React from 'react';
 import defined from 'terriajs-cesium/Source/Core/defined';
+import Styles from './search-box.scss';
+import Icon from "../Icon.jsx";
 
 /**
  * Super-simple dumb search box component.
+ * Used for both data catalog search and location search.
  */
 export default React.createClass({
     propTypes: {
-        initialSearchText: React.PropTypes.string,
         onSearchTextChanged: React.PropTypes.func.isRequired,
-        initialText: React.PropTypes.string
+        onDoSearch: React.PropTypes.func.isRequired,
+        searchText: React.PropTypes.string.isRequired,
+        onFocus: React.PropTypes.func,
+        searchBoxLabel: React.PropTypes.string,
+        onClear: React.PropTypes.func,
+        alwaysShowClear: React.PropTypes.bool,
+        autoFocus: React.PropTypes.bool
     },
 
     getDefaultProps() {
         return {
-            initialText: ''
+            searchBoxLabel: 'Search',
+            alwaysShowClear: false,
+            autoFocus: false
         };
     },
 
-    getInitialState() {
-        return {
-            text: this.props.initialText
-        };
+    componentWillUnmount() {
+        this.removeDebounce();
     },
 
     hasValue() {
-        return !!this.state.text.length;
+        return this.props.searchText.length > 0;
     },
 
     searchWithDebounce() {
-        // Trigger search 250ms after the last input.
-        this.removeDebounceTimeout();
+        // Trigger search 2 seconds after the last input.
+        this.removeDebounce();
 
-        this.debounceTimeout = setTimeout(() => {
-            this.props.onSearchTextChanged(this.state.text);
-            this.debounceTimeout = undefined;
-        }, 250);
+        if (this.props.searchText.length > 0) {
+            this.debounceTimeout = setTimeout(() => {
+                this.search();
+            }, 2000);
+        }
     },
 
-    removeDebounceTimeout() {
+    search() {
+        this.removeDebounce();
+        this.props.onDoSearch();
+    },
+
+    removeDebounce() {
         if (defined(this.debounceTimeout)) {
             clearTimeout(this.debounceTimeout);
             this.debounceTimeout = undefined;
@@ -48,44 +62,47 @@ export default React.createClass({
 
     handleChange(event) {
         const value = event.target.value;
-
-        this.setState({
-            text: value
-        });
-
+        this.props.onSearchTextChanged(value);
         this.searchWithDebounce();
     },
 
     clearSearch() {
-        this.setState({
-            text: ''
-        });
-        this.searchWithDebounce();
+        this.props.onSearchTextChanged('');
+        this.search();
+
+        if (this.props.onClear) {
+            this.props.onClear();
+        }
     },
 
-    setText(text) {
-        this.setState({
-            text: text
-        });
+    onKeyDown(event) {
+        if (event.keyCode === 13) {
+            this.search();
+        }
     },
 
     render() {
         const clearButton = (
-            <button type='button' className='btn btn--search-clear' onClick={this.clearSearch} />
+            <button type='button' className={Styles.searchClear} onClick={this.clearSearch}><Icon glyph={Icon.GLYPHS.close}/></button>
         );
 
         return (
-            <form className='form--search-data' autoComplete='off' onSubmit={event => event.preventDefault()}>
-                <label htmlFor='search' className='form__label'> Type keyword to search </label>
+            <form className={Styles.searchData} autoComplete='off' onSubmit={event => event.preventDefault()}>
+                <label htmlFor='search' className={Styles.formLabel}>
+                <Icon glyph={Icon.GLYPHS.search}/>
+                </label>
                 <input id='search'
                        type='text'
                        name='search'
-                       value={this.state.text}
+                       value={this.props.searchText}
                        onChange={this.handleChange}
-                       className='form__search-field field'
-                       placeholder='Search'
-                       autoComplete='off'/>
-                {this.hasValue() && clearButton}
+                       onFocus={this.props.onFocus}
+                       onKeyDown={this.onKeyDown}
+                       className={Styles.searchField}
+                       placeholder={this.props.searchBoxLabel}
+                       autoComplete='off'
+                       autoFocus={this.props.autoFocus} />
+                {(this.props.alwaysShowClear || this.hasValue()) && clearButton}
             </form>
         );
     }

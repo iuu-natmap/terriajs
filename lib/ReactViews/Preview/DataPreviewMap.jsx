@@ -11,13 +11,23 @@ const Terria = require('../../Models/Terria');
 const TerriaViewer = require('../../ViewModels/TerriaViewer.js');
 const ViewerMode = require('../../Models/ViewerMode');
 const when = require('terriajs-cesium/Source/ThirdParty/when');
+import Styles from './data-preview-map.scss';
 
+/**
+ * Leaflet-based preview map that sits within the preview.
+ */
 const DataPreviewMap = React.createClass({
     mixins: [ObserveModelMixin],
 
     propTypes: {
         terria: React.PropTypes.object.isRequired,
         previewedCatalogItem: React.PropTypes.object
+    },
+
+    getInitialState() {
+        return {
+            previewBadgeText: 'PREVIEW LOADING...',
+        };
     },
 
     componentWillMount() {
@@ -34,20 +44,35 @@ const DataPreviewMap = React.createClass({
         this.terriaPreview.homeView = terria.homeView;
         this.terriaPreview.initialView = terria.homeView;
         this.terriaPreview.regionMappingDefinitionsUrl = terria.regionMappingDefinitionsUrl;
+        this._unsubscribeErrorHandler = this.terriaPreview.error.addEventListener(e => {
+            if (e.sender === this.props.previewedCatalogItem ||
+                (e.sender && e.sender.nowViewingCatalogItem === this.props.previewedCatalogItem)) {
+                this._errorPreviewingCatalogItem = true;
+                this.setState({
+                    previewBadgeText: 'NO PREVIEW AVAILABLE'
+                });
+            }
+        });
 
         // TODO: we shouldn't hard code the base map here. (copied from branch analyticsWithCharts)
         const positron = new OpenStreetMapCatalogItem(this.terriaPreview);
         positron.name = 'Positron (Light)';
-        positron.url = 'http://basemaps.cartocdn.com/light_all/';
+        positron.url = '//global.ssl.fastly.net/light_all/';
         positron.attribution = '© OpenStreetMap contributors ODbL, © CartoDB CC-BY 3.0';
         positron.opacity = 1.0;
-        positron.subdomains = ['a', 'b', 'c', 'd'];
+        positron.subdomains = ['cartodb-basemaps-a','cartodb-basemaps-b','cartodb-basemaps-c','cartodb-basemaps-d'];
         this.terriaPreview.baseMap = positron;
 
         this.isZoomedToExtent = false;
         this.lastPreviewedCatalogItem = undefined;
         this.removePreviewFromMap = undefined;
-        this.previewBadgeElement = undefined;
+    },
+
+    componentWillUnmount() {
+        if (this._unsubscribeErrorHandler) {
+            this._unsubscribeErrorHandler();
+            this._unsubscribeErrorHandler = undefined;
+        }
     },
 
     componentDidMount() {
@@ -63,7 +88,11 @@ const DataPreviewMap = React.createClass({
             return;
         }
 
-        this.previewBadgeElement.textContent = 'PREVIEW LOADING...';
+        this.lastPreviewedCatalogItem = this.props.previewedCatalogItem;
+
+        this.setState({
+            previewBadgeText: 'DATA PREVIEW LOADING...'
+        });
 
         this.isZoomedToExtent = false;
         this.terriaPreview.currentViewer.zoomTo(this.terriaPreview.homeView);
@@ -80,7 +109,7 @@ const DataPreviewMap = React.createClass({
         const previewed = this.props.previewedCatalogItem;
         if (previewed && defined(previewed.type) && previewed.isMappable) {
             const that = this;
-            return when(previewed.load()).then(function() {
+            return when(previewed.load()).then(() => {
                 // If this item has a separate now viewing item, load it before continuing.
                 let nowViewingItem;
                 let loadNowViewingItemPromise;
@@ -92,10 +121,10 @@ const DataPreviewMap = React.createClass({
                     loadNowViewingItemPromise = when();
                 }
 
-                return loadNowViewingItemPromise.then(function() {
+                return loadNowViewingItemPromise.then(() => {
                     // Now that the item is loaded, add it to the map.
                     // Unless we've started previewing something else in the meantime!
-                    if (!that.isMounted() || previewed !== that.props.previewedCatalogItem) {
+                    if (!that._unsubscribeErrorHandler || previewed !== that.props.previewedCatalogItem) {
                         return;
                     }
 
@@ -104,21 +133,36 @@ const DataPreviewMap = React.createClass({
                             that.terriaPreview.clock.currentTime = nowViewingItem.clock.currentTime;
                         }
 
+                        this._errorPreviewingCatalogItem = false;
                         that.removePreviewFromMap = nowViewingItem.showOnSeparateMap(that.terriaPreview.currentViewer);
 
-                        if (that.removePreviewFromMap) {
-                            that.previewBadgeElement.textContent = 'PREVIEW';
+                        if (this._errorPreviewingCatalogItem) {
+                            this.setState({
+                                previewBadgeText: 'NO PREVIEW AVAILABLE'
+                            });
+                        } else if (that.removePreviewFromMap) {
+                            this.setState({
+                                previewBadgeText: 'DATA PREVIEW'
+                            });
                         } else {
-                            that.previewBadgeElement.textContent = 'NO PREVIEW AVAILABLE';
+                            this.setState({
+                                previewBadgeText: 'NO PREVIEW AVAILABLE'
+                            });
                         }
                     } else {
-                        that.previewBadgeElement.textContent = 'NO PREVIEW AVAILABLE';
+                        this.setState({
+                            previewBadgeText: 'NO PREVIEW AVAILABLE'
+                        });
                     }
 
                     that.updateBoundingRectangle();
                 });
-            }).otherwise(function() {
-                that.previewBadgeElement.textContent = 'NO PREVIEW AVAILABLE';
+            }).otherwise((err) => {
+                console.error(err);
+
+                this.setState({
+                    previewBadgeText: 'DATA PREVIEW ERROR'
+                });
             });
         }
     },
@@ -233,17 +277,13 @@ const DataPreviewMap = React.createClass({
         }
     },
 
-    refPreviewBadge(element) {
-        this.previewBadgeElement = element;
-    },
-
     render() {
-        return (<div className='data-preview-map' onClick={this.clickMap}>
-                    <div className='terria-preview' ref={this.mapIsReady}>
-                    </div>
-                    <label className='label--preview-badge' ref={this.refPreviewBadge}>PREVIEW LOADING...</label>
-                </div>
-                );
+        return (
+            <div className={Styles.map} onClick={this.clickMap}>
+                <div className={Styles.terriaPreview} ref={this.mapIsReady}/>
+                <label className={Styles.badge}>{this.state.previewBadgeText}</label>
+            </div>
+        );
     }
 });
 module.exports = DataPreviewMap;

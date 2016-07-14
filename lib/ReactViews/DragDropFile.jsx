@@ -1,24 +1,31 @@
-'use strict';
 import React from 'react';
+import classNames from 'classnames';
+
+import ObserveModelMixin from './ObserveModelMixin';
+import addUserFiles from '../Models/addUserFiles';
+
+import Styles from './drag-drop-file.scss';
 
 const DragDropFile = React.createClass({
+    mixins: [ObserveModelMixin],
+
     propTypes: {
-        isActive: React.PropTypes.bool,
         terria: React.PropTypes.object,
-        handleFile: React.PropTypes.func,
-        onFinishDroppingFile: React.PropTypes.func
+        viewState: React.PropTypes.object,
     },
 
     handleDrop(e) {
         e.preventDefault();
         e.stopPropagation();
 
-        const fakeEvent = {
-            target: e.dataTransfer
-        };
+        addUserFiles(e.dataTransfer.files, this.props.terria, this.props.viewState, null)
+            .then(addedCatalogItems => {
+                if (addedCatalogItems.length > 0) {
+                    this.props.viewState.myDataIsUploadView = false;
+                }
+            });
 
-        this.props.handleFile(fakeEvent);
-        this.props.onFinishDroppingFile();
+        this.props.viewState.isDraggingDroppingFile = false;
     },
 
     handleDragEnter(e) {
@@ -33,21 +40,30 @@ const DragDropFile = React.createClass({
 
     handleDragLeave(e) {
         if (e.screenX === 0 && e.screenY === 0) {
-            this.props.onFinishDroppingFile();
+            this.props.viewState.isDraggingDroppingFile = false;
         }
     },
 
+    handleMouseLeave() {
+        this.props.viewState.isDraggingDroppingFile = false;
+    },
+
     render() {
-        return <div onDrop={this.handleDrop}
-                    onDragEnter={this.handleDragEnter}
-                    onDragOver={this.handleDragOver}
-                    onDragLeave={this.handleDragLeave}
-                    className={(this.props.isActive ? 'is-active' : '') + ' drop-zone'}>
-                        <div className='drop-zone-inner'>
-                            <h3 className='dnd-heading'> Drag & Drop </h3>
-                            <div>Your data anywhere to view on the map</div>
-                        </div>
-                    </div>;
+        return (
+            <div onDrop={this.handleDrop}
+                 onDragEnter={this.handleDragEnter}
+                 onDragOver={this.handleDragOver}
+                 onDragLeave={this.handleDragLeave}
+                 onMouseLeave={this.handleMouseLeave}
+                 className={classNames(Styles.dropZone, {[Styles.isActive]: this.props.viewState.isDraggingDroppingFile})}>
+                <If condition={this.props.viewState.isDraggingDroppingFile}>
+                    <div className={Styles.inner}>
+                        <h3 className={Styles.heading}>Drag & Drop</h3>
+                        <div className={Styles.caption}>Your data anywhere to view on the map</div>
+                    </div>
+                </If>
+            </div>
+        );
     }
 });
 

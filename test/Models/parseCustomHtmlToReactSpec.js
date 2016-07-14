@@ -1,11 +1,10 @@
 'use strict';
 
 /*global require, fail*/
-import Chart from '../../lib/ReactViews/Chart/Chart';
-// import ChartExpandButton from '../../lib/ReactViews/Chart/ChartExpandButton';
-import Collapsible from '../../lib/ReactViews/Chart/Collapsible';
-import parseCustomHtmlToReact from '../../lib/Models/parseCustomHtmlToReact';
-import registerCustomComponentTypes from '../../lib/Models/registerCustomComponentTypes';
+import Chart from '../../lib/ReactViews/Custom/Chart/Chart';
+import Collapsible from '../../lib/ReactViews/Custom/Collapsible/Collapsible';
+import parseCustomHtmlToReact from '../../lib/ReactViews/Custom/parseCustomHtmlToReact';
+import registerCustomComponentTypes from '../../lib/ReactViews/Custom/registerCustomComponentTypes';
 import Terria from '../../lib/Models/Terria';
 
 import {findAllWithType, findAll} from 'react-shallow-testutils';
