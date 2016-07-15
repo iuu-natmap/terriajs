@@ -9,20 +9,21 @@ const FeedbackButton = React.createClass({
     mixins: [ObserveModelMixin],
 
     propTypes: {
+        terria: React.PropTypes.object,
         viewState: React.PropTypes.object.isRequired
     },
 
-    onClick() {
-        this.props.viewState.feedbackFormIsVisible = true;
+    componentWillMount() {
+        this.surveyLink = this.props.terria.configParameters.surveyLink;
     },
 
     render() {
         return (
             <div className={Styles.feedback}>
-                <button type='button' className={Styles.btnFeedback} onClick={this.onClick}>
+                <a href={this.surveyLink} target="_blank" className={Styles.btnFeedback}>
                     <Icon glyph={Icon.GLYPHS.feedback}/>
                     <span>Give feedback</span>
-                </button>
+                </a>
             </div>
         );
     }
