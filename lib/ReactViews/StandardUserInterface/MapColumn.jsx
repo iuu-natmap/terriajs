@@ -92,7 +92,7 @@ const MapColumn = React.createClass({
                         </If>
                         <If condition={!this.props.viewState.useSmallScreenInterface && this.props.terria.configParameters.feedbackUrl && !this.props.viewState.hideMapUi()}>
                             <div className={Styles.feedbackButtonWrapper}>
-                                <FeedbackButton viewState={this.props.viewState}/>
+                                <FeedbackButton terria={this.props.terria} viewState={this.props.viewState}/>
                             </div>
                         </If>
                     </div>
