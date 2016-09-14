@@ -2,6 +2,99 @@
 Change Log
 ==========
 
+### 4.4.0
+
+* Fixed a bug which caused Cesium to crash when plotting a CSV with non-numerical data in the depth column.
+* Added automatic time-series charts of attributes to the feature info of time-varying region-mapped csvs.
+* Refactored Csv, AbsItt and Sdmx-Json catalog items to depend on a common `TableCatalogItem`. Deprecated `CsvCatalogItem.setActiveTimeColumn` in favour of `tableStructure.setActiveTimeColumn`.
+* Error in geocoding addresses in csv files now shows in dialog box.
+* Fixed css styling of the timeline and added padding to the feature info panel.
+* Enhanced json support to recognise JSON5 format for user-added files.
+* Deprecated `indicesIntoUniqueValues`, `indicesOrValues`, `indicesOrNumericalValues` & `usesIndicesIntoUniqueValues` in `TableColumn` (`isEnum` replaces `usesIndicesIntoUniqueValues`).
+* Added support for explicitly colouring enum columns using a `tableStyle.colorBins` array of `{"value":v, "color":c}` objects
+* Improved rendering speed when changing the display variable for large lat/lon csv files.
+* Default to moving feature csvs if a time, lat, lon and a column named `id` are present.
+* Fixed a bug so units flow through to charts of moving csv features.
+* ContextItem now shown during location selection.
+* Fixed a bug that caused `&amp;` to appear in some URLs instead of simply `&`, leading to an error when visiting the link.
+* Added the ability to pass a LineString to a Web Processing Service.
+* Uses a smarter default column for csv files.
+* Fixed a bug that caused an error message to appear repeatedly when there was an error downloading tiles for a base map.
+
+### 4.3.3
+
+* Use react-rangeslider 1.0.4 because 1.0.5 was published incorrectly.
+
+### 4.3.2
+
+* Fixed css styling of shorten URL checkbox.
+
+### 4.3.1
+
+* Added the ability to specify the URL to the `serverConfig` service in `config.json` as `parameters.serverConfigUrl`.
+
+### 4.3.0
+
+* Added `Terria.batchGeocoder` property.  If set, the batch geocoder is used to resolve addresses in CSV files so that they can be shown as points on the map.
+* Added `GnafAddressGeocoder` to resolve Australian addresses using the GNAF API.
+* Added a loading indicator for user-added files.
+* Fixed a bug that prevented printing the map in the 2D mode.
+* Fixed a bug when changing between x-axis units in the chart panel.
+* Moved all Terria styles into CSS-modules code (except Leaflet) - `lib/Sass/StandardUserInterface.scss` no longer needs to be imported and now only includes styles for backwards compatibility.
+
+### 4.2.1
+
+* Fixed bug that prevented the preview map displaying on mobile devices.
+
+### 4.2.0
+
+* There is a known bug in this version which prevents the user from being able to choose a region for some Analytics functions.
+* Added support for ArcGis FeatureServers, using the new catalog types `esri-featureServer` and `esri-featureServer-group`. Catalog type `esri-group` can load REST service, MapServer and FeatureServer endpoints. (For backwards compatability, catalog type `esri-mapServer-group` continues to work for REST service as well as MapServer endpoints.)
+* Enumeration parameter now defaults to what is shown in UI, and if parameter is optional, '' is default.
+* Adds bulk geocoding capability for Australian addresses. So GnafAPI can be used with batches of addresses, if configured.
+* Fixed a bug that caused the selection indicator to get small when near the right edge of the map and to overlap the side panel when past the left edge.
+* Map controls and menus now become translucent while the explorer window (Data Catalog) is visible.
+* Removed find-and-replace for cesium workers from the webpack build as it's done in terriajs-cesium now.
+* Legend images that fail to load are now hidden entirely.
+* Improved the appearance of the opacity slider and added a percentage display.
+* AllowedValues for LiteralData WPS input now works even if only one value specified.
+* Fixed bug in WPS polygon datatype to return valid polygon geojson.
+* Fix regression: cursor changes in UserDrawing now functions in 2D as well as 3D.
+* Updated to [Cesium](http://cesiumjs.org) 1.23 (from 1.20).  See the [change log](https://github.com/AnalyticalGraphicsInc/cesium/blob/1.23/CHANGES.md) for details.
+* Fixed a bug which prevented feature info showing for Gpx-, Ogr-, WebFeatureService-, ArcGisFeatureServer-, and WebProcessingService- CatalogItems.
+* Added support for a wider range of SDMX-JSON data files, including the ability to sum over dimensions via `aggregatedDimensionIds`.
+* Added support for `tableStyle.colorBins` as array of values specifying the boundaries between the color bins in the legend, eg. `[3000, 3500, 3900, 4000]`. `colorBins` can still be an integer specifying the number of bins, in which case Terria determines the boundaries.
+* Made explorer panel not rendered at all when hidden and made the preview map destroy itself when unmounted - this mitigates performance issues from having Leaflet running in the background on very busy vector datasets.
+* Fixed a bug which prevented time-varying CZML feature info from updating.
+* Added support for moving-point csv files, via an `idColumns` array on csv catalog items. By default, feature positions, color and size are interpolated between the known time values; set `isSampled` to false to prevent this. (Color and size are never interpolated when they are drawn from a text column.)
+* Added support for polling csv files with a partial update, and by using `idColumns` to identify features across updates.
+* Added a time series chart to the Feature Info Panel for sampled, moving features.
+* Fixed a bug which sometimes prevented feature info from appearing when two region-mapped csv files were displayed.
+
+### 4.1.2
+
+* Fixed a bug that prevented sharing from working in Internet Explorer.
+
+### 4.1.1
+
+* Stopped IE9 from setting bizarre inline dimensions on custom branding images.
+* Fixed workbench reordering in browsers other than Chrome.
+* URLs on the dataset info page are now auto-selected by clicked, making them easier to copy.
+
+### 4.1.0
+
+* Made the column title for time-based CSV exports from chart default to 'date'
+* Stopped the CSV creation webworker from being run multiple times on viewing a chart.
+* Removed the empty circles from non-selected base maps on the Map settings panel.
+* Prevented text from being selected when dragging the compass control.
+* Added the `MeasureTool` to allow users to interactively measure the distance between points.
+* Worked around a problem in the Websense Web Filter that caused it to block access to some of the TerriaJS Web Workers due to a URL in the license text in a comment in a source file.
+
+### 4.0.2
+
+* Fixed a bug that prevented opening catalog groups on iOS.
+* Fixed a CSS warning.
+
 ### 4.0.1
 
 * Fixed a bug that caused an error message to be formatted incorrectly when displayed to the user.
@@ -9,6 +102,10 @@ Change Log
 ### 4.0.0
 
 * Rewrote the TerriaJS user interface using React.  We believe the new interface is a drastic improvement, incorporating user feedback and the results of usability testing.  Currently, it is a bit harder to customize than our old user interface, so if your application has extensive customizations, we suggest delaying upgrading to this version for a little while logner.
+* Added support for non-geospatial CSV files, which display in a new chart panel.
+* Added support for customisable tags in Feature Info templates.
+* Implemented [`<chart>` and `<collapsible>`](https://github.com/TerriaJS/terriajs/blob/4.0.0/lib/ReactViews/Custom/registerCustomComponentTypes.js#L52-L106) tags in Feature Info templates.
+* Added support for [polling](https://github.com/TerriaJS/terriajs/blob/4.0.0/lib/Models/Polling.js) for updates to CSV files.
 * `CswCatalogGroup` will now include Web Processing Services from the catalog if configured with `includeWps` set to true.
 * `WebMapServiceCatalogItem` will now detect ncWMS servers and set isNcWMS to true.
 * New `ShareDataService` which can store and resolve data. Currently it is used as a replacement for Google URL Shortener, which can't handle long URLs.

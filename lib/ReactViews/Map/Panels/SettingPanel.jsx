@@ -30,7 +30,7 @@ const SettingPanel = React.createClass({
 
     getInitialState() {
         return {
-            activeMap: this.props.terria.baseMap.name
+            activeMap: this.props.terria.baseMap ? this.props.terria.baseMap.name : '(None)'
         };
     },
 
@@ -52,7 +52,7 @@ const SettingPanel = React.createClass({
 
     mouseLeaveBaseMap() {
         this.setState({
-            activeMap: this.props.terria.baseMap.name
+            activeMap: this.props.terria.baseMap ? this.props.terria.baseMap.name : '(None)'
         });
     },
 
@@ -76,7 +76,7 @@ const SettingPanel = React.createClass({
     render() {
         const that = this;
         const currentViewer = this.props.terria.viewerMode;
-        const currentBaseMap = this.props.terria.baseMap.name;
+        const currentBaseMap = this.props.terria.baseMap ? this.props.terria.baseMap.name : '(None)';
 
         const dropdownTheme = {
             outer: Styles.settingPanel,
@@ -113,7 +113,7 @@ const SettingPanel = React.createClass({
                                     onMouseEnter={that.mouseEnterBaseMap.bind(this, baseMap)}
                                     onMouseLeave={that.mouseLeaveBaseMap.bind(this, baseMap)}
                                     onFocus={that.mouseEnterBaseMap.bind(this, baseMap)}>
-                                    {baseMap.catalogItem.name === currentBaseMap ? <Icon glyph={Icon.GLYPHS.selected }/>: <Icon glyph={Icon.GLYPHS.radioOff}/>}
+                                    {baseMap.catalogItem.name === currentBaseMap ? <Icon glyph={Icon.GLYPHS.selected }/>: null }
                                     <img alt={baseMap.catalogItem.name} src={baseMap.image}/>
                                 </button>
                             </li>

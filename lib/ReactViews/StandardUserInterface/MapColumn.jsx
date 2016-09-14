@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import 'mutationobserver-shim';
 
 import TerriaViewerWrapper from '../Map/TerriaViewerWrapper.jsx';
@@ -43,7 +42,7 @@ const MapColumn = React.createClass({
 
     addBottomDock(bottomDock) {
         if (isIE) {
-            this.observer.observe(ReactDOM.findDOMNode(bottomDock), {
+            this.observer.observe(bottomDock, {
                 childList: true,
                 subtree: true
             });
@@ -77,7 +76,7 @@ const MapColumn = React.createClass({
         return (
             <div className={Styles.mapInner}>
                 <div className={Styles.mapRow}>
-                    <div className={classNames(Styles.mapCell, 'map')} ref={this.newMapCell}>
+                    <div className={classNames(Styles.mapCell, Styles.mapCellMap)} ref={this.newMapCell}>
                         <div className={Styles.mapWrapper}
                              style={{height: this.state.height || (isIE ? '100vh' : '100%')}}>
                             <TerriaViewerWrapper terria={this.props.terria}
@@ -108,7 +107,7 @@ const MapColumn = React.createClass({
                     <div className={Styles.mapRow}>
                         <div className={Styles.mapCell}>
                             <BottomDock terria={this.props.terria} viewState={this.props.viewState}
-                                        ref={this.addBottomDock}/>
+                                        domElementRef={this.addBottomDock}/>
                         </div>
                     </div>
                 </If>

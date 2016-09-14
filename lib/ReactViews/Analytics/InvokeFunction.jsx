@@ -1,11 +1,9 @@
 import React from 'react';
-import knockout from 'terriajs-cesium/Source/ThirdParty/knockout';
 import ObserveModelMixin from '../ObserveModelMixin';
 import ParameterEditor from './ParameterEditor';
 import when from 'terriajs-cesium/Source/ThirdParty/when';
 import TerriaError from '../../Core/TerriaError';
 import parseCustomMarkdownToReact from '../Custom/parseCustomMarkdownToReact';
-import defined from 'terriajs-cesium/Source/Core/defined';
 import Styles from './invoke-function.scss';
 
 const InvokeFunction = React.createClass({
@@ -17,24 +15,9 @@ const InvokeFunction = React.createClass({
         viewState: React.PropTypes.object
     },
 
-    componentWillMount() {
-        this._parameterValues = {};
-        knockout.track(this, ['_parameterValues']);
-
-        this.initializeParameters(this.props);
-    },
-
-    componentWillUnmount() {
-        this.removeContextItem();
-    },
-
-    componentWillReceiveProps(nextProps) {
-        this.initializeParameters(nextProps);
-    },
-
     submit() {
         try {
-            const promise = when(this.props.previewed.invoke(this._parameterValues))
+            const promise = when(this.props.previewed.invoke())
                 .otherwise(terriaError => {
                     if (terriaError instanceof TerriaError) {
                         this.props.previewed.terria.error.raiseEvent(terriaError);
@@ -56,32 +39,6 @@ const InvokeFunction = React.createClass({
         }
     },
 
-    initializeParameters(props) {
-        this._parameterValues = {};
-
-        const parameters = props.previewed.parameters;
-        for (let i = 0; i < parameters.length; ++i) {
-            const parameter = parameters[i];
-            this._parameterValues[parameter.id] = parameter.defaultValue;
-        }
-
-        knockout.track(this._parameterValues);
-
-        // Enable the context item, if any.
-        this.removeContextItem();
-        if (defined(props.previewed.contextItem)) {
-            props.previewed.contextItem.isEnabled = true;
-            this._lastContextItem = props.previewed.contextItem;
-        }
-    },
-
-    removeContextItem() {
-        if (defined(this._lastContextItem)) {
-            this._lastContextItem.isEnabled = false;
-            this._lastContextItem = undefined;
-        }
-    },
-
     getParams() {
         // Key should include the previewed item identifier so that
         // components are refreshed when different previewed items are
@@ -91,7 +48,6 @@ const InvokeFunction = React.createClass({
                          parameter={param}
                          viewState={this.props.viewState}
                          previewed={this.props.previewed}
-                         parameterValues={this._parameterValues}
         />
     );},
 

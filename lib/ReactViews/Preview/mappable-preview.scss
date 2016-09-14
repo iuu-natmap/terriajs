@@ -1,11 +1,16 @@
 @import '~terriajs-variables';
 @import '../../Sass/common/mixins';
 
+.root {
+  font-size: 0.9rem;
+}
 
 .btn--add{
   composes: btn from '../../Sass/common/_buttons.scss';
   composes: btn-primary from '../../Sass/common/_buttons.scss';
+
   z-index: 10; // keeps the button above the preview map in IE9.
+  padding: 10px;
 
   // toggle-enable data-preview__add-to-map
   @media screen and (min-width: $sm){
@@ -21,12 +26,29 @@
   margin: 2*$padding;
 }
 
-
 .field {
   composes: field from '../../Sass/common/_form.scss';
 }
 
-
-.url{
+.description{
   @extend %wrap;
+
+  a {
+    @extend %link;
+  }
+}
+
+.link {
+  composes: link from '../../Sass/common/_base.scss';
+}
+
+.h3 {
+  composes: h3 from '../../Sass/common/_base.scss';
+
+  font-size: 1.1rem;
+}
+.h4 {
+  composes: h4 from '../../Sass/common/_base.scss';
+
+  font-size: 0.9rem;
 }

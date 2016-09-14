@@ -1,28 +1,22 @@
 @import '~terriajs-variables';
 @import '../../Sass/common/mixins';
-// Save 1px for drop zone
-$workbench-margin: $padding-small - 1px;
+
+$workbench-margin: $padding-small;
 
 .workbench-item {
   background: $dark-with-overlay;
   color: #fff;
   font-family: $font-pop;
-  margin: $workbench-margin/2 0;
+  margin: $workbench-margin 0;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  @media print{
-    color: #000;
+
+  &.workbench-item:global(.ui-sortable-item) {
+    cursor: auto;
+    float: none;
   }
 
-  &.is-dragging {
-    opacity: 0.5;
-
-    .workbench__header {
-      display: none !important;
-    }
-
-    .inner {
-      display: none !important;
-    }
+  @media print{
+    color: #000;
   }
 
   .is-open {
@@ -66,9 +60,8 @@ $workbench-margin: $padding-small - 1px;
 }
 
 .btn-visibility {
-
+  composes: btn from '../../Sass/common/_buttons.scss';
 }
-
 
 .nameColumn {
   composes: col from  '../../Sass/common/_base.scss';
@@ -82,15 +75,18 @@ $workbench-margin: $padding-small - 1px;
   composes: col-1 from  '../../Sass/common/_base.scss';
   padding: 5px;
   //remove additional space below inline element
-  button{
-    display: block;
-  }
   svg{
     height: 18px;
     width: 18px;
     fill: #fff;
   }
 }
+
+.btn-toggle {
+  composes: btn from '../../Sass/common/_buttons.scss';
+  display: block;
+}
+
 .iconLineChart {
   float: left;
   font-size: 140%;
@@ -102,4 +98,9 @@ $workbench-margin: $padding-small - 1px;
     display: inline-block;
     vertical-align: top;
   }
+}
+
+.draggable {
+  font-size: 0.9rem;
+  cursor: move;
 }
