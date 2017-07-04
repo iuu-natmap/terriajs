@@ -19,6 +19,7 @@ The following people have contributed to TerriaJS:
    * [Mats Henrikson](https://github.com/meh9)
    * [Stephen Davies](https://github.com/steve9164)
    * [Rebecca Dengate](https://github.com/rdengate)
+   * [Ashley Stacey](https://github.com/a-stacey)
 * [Geoscience Australia](http://www.ga.gov.au/)
    * [Darren Reid](https://github.com/Layoric)
 * [Propeller Aerobotics](http://www.propelleraero.com.au/)
@@ -35,3 +36,8 @@ The following people have contributed to TerriaJS:
    * [Rich Signell](https://github.com/rsignell-usgs)
 * [JCU e-Research](http://eresearch.jcu.edu.au/)
    * [Daniel Baird](https://github.com/DanielBaird)
+* [Jurassic Coast Trust](http://jurassiccoast.org)
+   * [Geoffrey Rowland](https://github.com/geoffrowland)
+* [Department of the Prime Minister and Cabinet](https://www.dpmc.gov.au/)
+   * [Toby Bellwood](https://github.com/tobybellwood)
+   

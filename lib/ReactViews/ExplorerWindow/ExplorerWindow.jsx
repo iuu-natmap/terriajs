@@ -1,4 +1,6 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import ko from 'terriajs-cesium/Source/ThirdParty/knockout';
 
@@ -9,12 +11,13 @@ import Styles from './explorer-window.scss';
 
 const SLIDE_DURATION = 300;
 
-const ExplorerWindow = React.createClass({
+const ExplorerWindow = createReactClass({
+    displayName: 'ExplorerWindow',
     mixins: [ObserveModelMixin],
 
     propTypes: {
-        terria: React.PropTypes.object.isRequired,
-        viewState: React.PropTypes.object.isRequired
+        terria: PropTypes.object.isRequired,
+        viewState: PropTypes.object.isRequired
     },
 
     getInitialState() {
@@ -31,13 +34,8 @@ const ExplorerWindow = React.createClass({
     componentWillMount() {
         this.props.viewState.explorerPanelAnimating = true;
 
-        this._pickedFeaturesSubscription = ko.pureComputed(this.isVisible, this).subscribe(isVisible => {
-            if (isVisible) {
-                this.slideIn();
-            } else {
-                this.slideOut();
-            }
-        }, this);
+        this._pickedFeaturesSubscription = ko.pureComputed(this.isVisible, this).subscribe(this.onVisibilityChange);
+        this.onVisibilityChange(this.isVisible());
     },
 
     componentDidMount() {
@@ -47,6 +45,14 @@ const ExplorerWindow = React.createClass({
             }
         };
         window.addEventListener('keydown', this.escKeyListener, true);
+    },
+
+    onVisibilityChange(isVisible) {
+        if (isVisible) {
+            this.slideIn();
+        } else {
+            this.slideOut();
+        }
     },
 
     slideIn() {
@@ -112,7 +118,7 @@ const ExplorerWindow = React.createClass({
                 </div>
             </div>
         ) : null;
-    }
+    },
 });
 
 module.exports = ExplorerWindow;

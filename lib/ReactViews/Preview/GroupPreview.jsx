@@ -1,5 +1,9 @@
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
+import PropTypes from 'prop-types';
+
 import DataPreviewSections from './DataPreviewSections';
 import DataPreviewUrl from './DataPreviewUrl.jsx';
 import ObserveModelMixin from '../ObserveModelMixin';
@@ -9,13 +13,14 @@ import parseCustomMarkdownToReact from '../Custom/parseCustomMarkdownToReact';
 /**
  * A "preview" for CatalogGroup.
  */
-const GroupPreview = React.createClass({
+const GroupPreview = createReactClass({
+    displayName: 'GroupPreview',
     mixins: [ObserveModelMixin],
 
     propTypes: {
-        previewed: React.PropTypes.object.isRequired,
-        terria: React.PropTypes.object.isRequired,
-        viewState: React.PropTypes.object.isRequired,
+        previewed: PropTypes.object.isRequired,
+        terria: PropTypes.object.isRequired,
+        viewState: PropTypes.object.isRequired,
     },
 
     backToMap() {
@@ -34,7 +39,7 @@ const GroupPreview = React.createClass({
                             <When
                                 condition={this.props.previewed.description && this.props.previewed.description.length > 0}>
                                 <div>
-                                    <h4>Description</h4>
+                                    <h4 className={Styles.h4}>Description</h4>
                                     {parseCustomMarkdownToReact(this.props.previewed.description, {catalogItem: this.props.previewed})}
                                 </div>
                             </When>
@@ -44,19 +49,19 @@ const GroupPreview = React.createClass({
 
                         <If condition={metadataItem.dataCustodian}>
                             <div>
-                                <h4>Data Custodian</h4>
+                                <h4 className={Styles.h4}>Data Custodian</h4>
                                 {parseCustomMarkdownToReact(metadataItem.dataCustodian, {catalogItem: metadataItem})}
                             </div>
                         </If>
 
-                        <If condition={metadataItem.url && metadataItem.url.length}>
+                        <If condition={metadataItem.url && metadataItem.url.length && !metadataItem.hideSource}>
                             <DataPreviewUrl metadataItem={metadataItem}/>
                         </If>
                     </div>
                 </div>
             </div>
         );
-    }
+    },
 });
 
 export default GroupPreview;

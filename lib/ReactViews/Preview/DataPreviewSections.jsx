@@ -1,8 +1,14 @@
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
+import PropTypes from 'prop-types';
+
 import naturalSort from 'javascript-natural-sort';
 import parseCustomMarkdownToReact from '../Custom/parseCustomMarkdownToReact';
 import ObserveModelMixin from '../ObserveModelMixin';
+
+import Styles from './data-preview.scss';
 
 naturalSort.insensitive = true;
 
@@ -22,11 +28,12 @@ const DEFAULT_SECTION_ORDER = [
  * CatalogItem-defined sections that sit within the preview description. These are ordered according to the catalog item's
  * order if available.
  */
-const DataPreviewSections = React.createClass({
+const DataPreviewSections = createReactClass({
+    displayName: 'DataPreviewSections',
     mixins: [ObserveModelMixin],
 
     propTypes: {
-        metadataItem: React.PropTypes.object.isRequired
+        metadataItem: PropTypes.object.isRequired
     },
 
     sortInfoSections(items) {
@@ -50,21 +57,21 @@ const DataPreviewSections = React.createClass({
 
     render() {
         const metadataItem = this.props.metadataItem;
-        const items = metadataItem.info.slice();
+        const items = metadataItem.hideSource ? metadataItem.infoWithoutSources : metadataItem.info.slice();
 
         return (
             <div>
                 <For each="item" index="i" of={this.sortInfoSections(items)}>
                     <If condition={item.content && item.content.length > 0}>
                         <div key={i}>
-                            <h4>{item.name}</h4>
+                            <h4 className={Styles.h4}>{item.name}</h4>
                             {parseCustomMarkdownToReact(item.content, {catalogItem: metadataItem})}
                         </div>
                     </If>
                 </For>
             </div>
         );
-    }
+    },
 });
 
 export default DataPreviewSections;

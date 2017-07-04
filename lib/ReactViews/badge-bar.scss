@@ -11,6 +11,8 @@
   padding-right: $padding-small + $padding + 1;
 
   background-color: $overlay;
+  color: $text-light;
+
   //to make sure scrolling of the content below the badge is correct
   height: $badge-height;
   line-height: $badge-height;
@@ -19,7 +21,7 @@
   li{
     display: inline-block;
     float: left;
-    font-size: 12px;
+    font-size: $font-size-small;
     &:last-child{
       float: right;
     }

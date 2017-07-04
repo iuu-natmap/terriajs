@@ -4,6 +4,8 @@
   composes: clearfix from '../../../Sass/common/_base.scss';
   composes: list-reset from '../../../Sass/common/_base.scss';
   font-family: $font-mono;
+  font-size: $font-size-small;
+
   li {
     display: block;
   }
@@ -14,11 +16,13 @@
 
 .legend__inner {
   a{
-    display: block;
+    // Only the actual legend should be clickable rather than the whole area
+    display: inline-block;
   }
   img {
     display: inline-block;
     background: #fff;
+    max-width: 100%;
   }
   padding: $padding 0 0 0;
 }
@@ -46,4 +50,8 @@
   svg{
      fill: #fff;
   }
+}
+
+.imageAnchor {
+  max-width: 100%;
 }

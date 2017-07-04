@@ -1,6 +1,8 @@
 'use strict';
 
 import React from 'react';
+import createReactClass from 'create-react-class';
+import PropTypes from 'prop-types';
 import {buildShareLink, buildShortShareLink, canShorten} from './BuildShareLink';
 import ObserverModelMixin from '../../../ObserveModelMixin';
 import defined from 'terriajs-cesium/Source/Core/defined';
@@ -11,15 +13,16 @@ import Styles from './share-panel.scss';
 import DropdownStyles from '../panel.scss';
 import Icon from "../../../Icon.jsx";
 
-const SharePanel = React.createClass({
+const SharePanel = createReactClass({
+    displayName: 'SharePanel',
     mixins: [ObserverModelMixin],
 
     propTypes: {
-        terria: React.PropTypes.object,
-        userPropWhiteList: React.PropTypes.array,
-        isOpen: React.PropTypes.bool,
-        shortenUrls: React.PropTypes.bool,
-        viewState: React.PropTypes.object.isRequired
+        terria: PropTypes.object,
+        userPropWhiteList: PropTypes.array,
+        isOpen: PropTypes.bool,
+        shortenUrls: PropTypes.bool,
+        viewState: PropTypes.object.isRequired
     },
 
     getDefaultProps() {
@@ -124,14 +127,14 @@ const SharePanel = React.createClass({
             <MenuPanel theme={dropdownTheme}
                        btnText="Share"
                        viewState={this.props.viewState}
-                       btnTitle="change settings"
+                       btnTitle="Share your map with others"
                        onOpenChanged={this.onOpenChanged}
                        smallScreen={this.props.viewState.useSmallScreenInterface}>
                 <If condition={this.state.isOpen}>
                         <div className={DropdownStyles.section}>
                             <div className={Styles.imgShare} style={shareImgStyle}></div>
-                            <div className={Styles.imgLink}>
-                                <a href={this.state.imageUrl} target='_blank'>View full size image</a>
+                            <div className={Styles.linkWrapper}>
+                                <a className={Styles.link} href={this.state.imageUrl} target='_blank'>View full size image</a>
                             </div>
                         </div>
                         <div className={DropdownStyles.section}>
@@ -148,9 +151,7 @@ const SharePanel = React.createClass({
                         </div>
                         <If condition={this.isUrlShortenable()}>
                             <div className={classNames(DropdownStyles.section, Styles.shortenUrl)}>
-                                <button
-                                    className={classNames(Styles.btn, {[Styles.btnCheckboxOn]: this.shouldShorten(), [Styles.btnCheckboxOff]: !this.shouldShorten()})}
-                                    onClick={this.onShortenClicked}>
+                                <button onClick={this.onShortenClicked}>
                                     {this.shouldShorten() ? <Icon glyph={Icon.GLYPHS.checkboxOn}/> : <Icon glyph={Icon.GLYPHS.checkboxOff}/>}
                                     Shorten the share URL using a web service
                                 </button>
@@ -159,7 +160,7 @@ const SharePanel = React.createClass({
                 </If>
             </MenuPanel>
         );
-    }
+    },
 });
 
 export default SharePanel;

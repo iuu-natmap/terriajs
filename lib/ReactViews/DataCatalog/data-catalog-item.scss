@@ -9,6 +9,7 @@
 }
 
 .btn-catalog-item {
+  font-size: $font-size-small;
   composes: btn from '../../Sass/common/_buttons.scss';
   @extend %wrap;
   position: relative;
@@ -31,6 +32,7 @@
   }
 
   @media screen and (max-width: $sm) {
+    font-size: $font-size-mid-small;
     padding-top: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid $grey-lighter;
@@ -38,6 +40,8 @@
 }
 
 .btn-action {
+  composes: btn from '../../Sass/common/_buttons.scss';
+
   position: absolute;
   color: $color-primary;
   right: 0;
@@ -55,7 +59,7 @@
 
   &:hover, &:focus{
     svg{
-      fill: $turquoise-blue;
+      fill: $modal-highlight;
     }
   }
 

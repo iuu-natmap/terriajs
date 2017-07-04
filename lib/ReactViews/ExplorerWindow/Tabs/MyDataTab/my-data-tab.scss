@@ -16,13 +16,18 @@
 }
 
 .added-data{
-  background: $modal-secondary-bg;
+  composes: scrollbars from '../../../../Sass/common/_base.scss';
+
   padding: $padding;
   height: 100%;
   overflow: hidden;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   background: $modal-secondary-bg;
+}
+
+.explanation {
+  font-family: $font-base;
+  font-size: $font-size-mid-small;
 }
 
 .btn--back-to-my-data{
@@ -47,6 +52,9 @@
   margin-top: $padding;
 }
 
-
+.h3 {
+  composes: h3 from '../../../../Sass/common/_base.scss';
+  font-size: $font-size-mid-large;
+}
 
 

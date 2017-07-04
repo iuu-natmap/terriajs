@@ -1,5 +1,9 @@
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
+import PropTypes from 'prop-types';
+
 import DataCatalogGroup from '../../../DataCatalog/DataCatalogGroup.jsx';
 import DataPreview from '../../../Preview/DataPreview.jsx';
 import AddData from './AddData.jsx';
@@ -8,12 +12,13 @@ import ObserveModelMixin from '../../../ObserveModelMixin';
 import Styles from './my-data-tab.scss';
 
 // My data tab include Add data section and preview section
-const MyDataTab = React.createClass({
+const MyDataTab = createReactClass({
+    displayName: 'MyDataTab',
     mixins: [ObserveModelMixin],
 
     propTypes: {
-        terria: React.PropTypes.object,
-        viewState: React.PropTypes.object
+        terria: PropTypes.object,
+        viewState: PropTypes.object
     },
 
     onBackButtonClicked() {
@@ -41,15 +46,17 @@ const MyDataTab = React.createClass({
                                     Back
                                 </button>
                             </If>
-                            <h3>Adding your own data</h3>
+                            <h3 className={Styles.h3}>Adding your own data</h3>
                             <AddData terria={this.props.terria}
                                      viewState={this.props.viewState}/>
                         </div>
                     </If>
                     <If condition={this.hasUserAddedData()}>
                         <div className={Styles.addedData}>
-                            <p>Data added in this way is not saved or made visible to others unless you explicitly share
-                                it by using the Share panel. </p>
+                            <p className={Styles.explanation}>
+                                Data added in this way is not saved or made visible to others unless you explicitly share
+                                it by using the Share panel.
+                            </p>
                             <ul className={Styles.dataCatalog}>
                                 <DataCatalogGroup group={this.props.terria.catalog.userAddedDataGroup}
                                                   viewState={this.props.viewState}/>
@@ -68,7 +75,7 @@ const MyDataTab = React.createClass({
                 />
             </div>
         );
-    }
+    },
 });
 
 module.exports = MyDataTab;
