@@ -1,5 +1,9 @@
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
+import PropTypes from 'prop-types';
+
 import Compass from './Navigation/Compass.jsx';
 import MyLocation from './Navigation/MyLocation.jsx';
 import ZoomControl from './Navigation/ZoomControl.jsx';
@@ -9,13 +13,14 @@ import ViewerMode from '../../Models/ViewerMode';
 import Styles from './map-navigation.scss';
 
 // The map navigation region
-const MapNavigation = React.createClass({
+const MapNavigation = createReactClass({
+    displayName: 'MapNavigation',
     mixins: [ObserveModelMixin],
 
     propTypes: {
-        terria: React.PropTypes.object.isRequired,
-        viewState: React.PropTypes.object.isRequired,
-        navItems: React.PropTypes.arrayOf(React.PropTypes.element)
+        terria: PropTypes.object.isRequired,
+        viewState: PropTypes.object.isRequired,
+        navItems: PropTypes.arrayOf(PropTypes.element)
     },
 
     getDefaultProps() {
@@ -35,9 +40,11 @@ const MapNavigation = React.createClass({
                 <div className={Styles.control}>
                     <ZoomControl terria={this.props.terria}/>
                 </div>
-                <div className={Styles.control}>
-                    <MyLocation terria={this.props.terria}/>
-                </div>
+                <If condition={!this.props.terria.configParameters.disableMyLocation}>
+                    <div className={Styles.control}>
+                        <MyLocation terria={this.props.terria}/>
+                    </div>
+                </If>
                 <For each="item" of={this.props.navItems} index="i">
                     <div className={Styles.control} key={i}>
                         {item}
@@ -45,7 +52,7 @@ const MapNavigation = React.createClass({
                 </For>
             </div>
         );
-    }
+    },
 });
 
 export default MapNavigation;
